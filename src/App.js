@@ -5,6 +5,7 @@ function App() {
   const [bgColor, setBgColor] = useState("#FFFFFF");
   const [fontFamily, setFontFamily] = useState("sans-serif");
   const [showSettings, setShowSettings] = useState(false);
+  const [partyMode, setPartyMode] = useState(false); // パーティーモードの状態
   const displayRef = useRef(null);
 
   const adjustFontSize = () => {
@@ -65,8 +66,54 @@ function App() {
     adjustFontSize();
   };
 
+  // アニメーション用のスタイルを定義
+  const partyStyles = partyMode
+    ? {
+        backgroundColor: undefined,
+        backgroundImage:
+          "linear-gradient(to bottom left, red, orange, yellow, green, blue, indigo, violet)",
+        backgroundSize: "200% 200%",
+        animation: "bgAnimation 5s infinite linear",
+      }
+    : {
+        backgroundColor: bgColor,
+        backgroundImage: undefined,
+        animation: undefined,
+      };
+
+  const textStyles = partyMode
+    ? {
+        color: undefined,
+        background:
+          "linear-gradient(to bottom left, red, orange, yellow, green, blue, indigo, violet)",
+        backgroundSize: "200% 200%",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        animation: "textAnimation 2s infinite linear",
+      }
+    : {
+        color: textColor,
+        background: undefined,
+        WebkitBackgroundClip: undefined,
+        WebkitTextFillColor: undefined,
+        animation: undefined,
+      };
+
   return (
-    <div style={{ height: "100%", backgroundColor: bgColor }}>
+    <div style={{ height: "100%", ...partyStyles }}>
+      {/* キーフレームを定義 */}
+      <style>
+        {`
+          @keyframes bgAnimation {
+            0% { background-position: top right; }
+            100% { background-position: bottom left; }
+          }
+          @keyframes textAnimation {
+            0% { background-position: bottom left; }
+            100% { background-position: top right; }
+          }
+        `}
+      </style>
       <div
         ref={displayRef}
         contentEditable
@@ -79,11 +126,11 @@ function App() {
           height: "100%",
           textAlign: "center",
           wordBreak: "break-word",
-          color: textColor,
           fontFamily: fontFamily,
           outline: "none",
           overflow: "hidden",
           margin: 0,
+          ...textStyles,
         }}
       ></div>
       <div
@@ -153,6 +200,7 @@ function App() {
               value={textColor}
               onChange={(e) => setTextColor(e.target.value)}
               style={{ marginLeft: "5px" }}
+              disabled={partyMode} // パーティーモード時は無効化
             />
           </label>
           <br />
@@ -162,6 +210,17 @@ function App() {
               type="color"
               value={bgColor}
               onChange={(e) => setBgColor(e.target.value)}
+              style={{ marginLeft: "5px" }}
+              disabled={partyMode} // パーティーモード時は無効化
+            />
+          </label>
+          <br />
+          <label>
+            パーティーモード:
+            <input
+              type="checkbox"
+              checked={partyMode}
+              onChange={() => setPartyMode(!partyMode)}
               style={{ marginLeft: "5px" }}
             />
           </label>
