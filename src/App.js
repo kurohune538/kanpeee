@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import ReactGA from "react-ga4";
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
   const [partyMode, setPartyMode] = useState(false); // パーティーモードの状態
   const displayRef = useRef(null);
 
-  const adjustFontSize = () => {
+  const adjustFontSize = useCallback(() => {
     const display = displayRef.current;
     if (!display) return;
 
@@ -53,7 +53,7 @@ function App() {
 
     // 最適なフォントサイズを設定
     display.style.fontSize = (minFontSize - 1) + "px";
-  };
+  }, []);
 
   useEffect(() => {
     // Google Analytics の初期化
@@ -65,22 +65,21 @@ function App() {
     return () => {
       window.removeEventListener("resize", adjustFontSize);
     };
-  }, []);
+  }, [adjustFontSize]);
 
   // イベントトラッキング関数
-  const trackEvent = (category, action, label) => {
+  const trackEvent = useCallback((category, action, label) => {
     ReactGA.event({
       category: category,
       action: action,
       label: label,
     });
-  };
+  }, []);
 
-  const handleInput = () => {
+  const handleInput = useCallback(() => {
     adjustFontSize();
     trackEvent("User Interaction", "Text Input", "User entered text");
-
-  };
+  }, [adjustFontSize, trackEvent]);
 
   // アニメーション用のスタイルを定義
   const partyStyles = partyMode
