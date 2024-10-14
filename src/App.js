@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import ReactGA from "react-ga4";
 
 function App() {
   const [textColor, setTextColor] = useState("#000000");
@@ -55,6 +56,10 @@ function App() {
   };
 
   useEffect(() => {
+    // Google Analytics の初期化
+    ReactGA.initialize("G-Z7K41LG20W"); // あなたの測定IDに置き換えてください
+    ReactGA.send("pageview");
+
     adjustFontSize();
     window.addEventListener("resize", adjustFontSize);
     return () => {
@@ -62,8 +67,19 @@ function App() {
     };
   }, []);
 
+  // イベントトラッキング関数
+  const trackEvent = (category, action, label) => {
+    ReactGA.event({
+      category: category,
+      action: action,
+      label: label,
+    });
+  };
+
   const handleInput = () => {
     adjustFontSize();
+    trackEvent("User Interaction", "Text Input", "User entered text");
+
   };
 
   // アニメーション用のスタイルを定義
@@ -144,7 +160,11 @@ function App() {
           userSelect: "none",
           backgroundColor: "rgba(255, 255, 255, 0.8)",
         }}
-        onClick={() => setShowSettings(!showSettings)}
+        onClick={() => {
+          setShowSettings(!showSettings);
+          trackEvent("User Interaction", "Toggle Settings", showSettings ? "Hide Settings" : "Show Settings");
+
+        }}
       >
         {/* ハンバーガーメニューまたはバツアイコンを切り替え */}
         {showSettings ? (
@@ -220,7 +240,10 @@ function App() {
             <input
               type="checkbox"
               checked={partyMode}
-              onChange={() => setPartyMode(!partyMode)}
+              onChange={() => {
+                setPartyMode(!partyMode);
+                trackEvent("User Interaction", "Toggle Party Mode", partyMode ? "Disable Party Mode" : "Enable Party Mode");
+              }}
               style={{ marginLeft: "5px" }}
             />
           </label>
